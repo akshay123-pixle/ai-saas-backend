@@ -28,7 +28,7 @@ router.post(
 
     // Handle the event
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "payment_intent.succeeded": {
         const session = event.data.object;
         console.log("✅ Payment successful, session:", session);
 

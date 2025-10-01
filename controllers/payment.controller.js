@@ -9,6 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const vCreate = async (req, res) => {
   console.log("Inside vCreate, req.body:", req.body);
   const { unit_amount, serviceType = "Premium" } = req.body;
+  const userId=req.user?.userId;
 
   if (!unit_amount) {
     return res
@@ -36,7 +37,7 @@ export const vCreate = async (req, res) => {
       metadata: {
         serviceType,
         unit_amount: unit_amount.toString(),
-        userId:req.user?.userId,
+        userId:userId,
         // maybe userId if you want; but be careful about manipulation
       },
       // success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,

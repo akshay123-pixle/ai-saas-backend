@@ -4,6 +4,6 @@ import { protect } from '../middleware/authentication.middleware.js';
 
 const router = express.Router();
 
-router.post('/create', vCreate);
+router.post('/create', protect, vCreate);
 
 export default router;
