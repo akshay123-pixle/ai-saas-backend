@@ -8,8 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const vCreate = async (req, res) => {
   console.log("Inside vCreate, req.body:", req.body);
-  const { unit_amount, serviceType = "Premium" } = req.body;
-  const userId=req.user?.userId;
+  const { unit_amount, serviceType = "Premium" ,userId} = req.body;
 
   if (!unit_amount) {
     return res
