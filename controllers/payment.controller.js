@@ -41,8 +41,8 @@ export const vCreate = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: `${FRONTEND_API}/success`,
-      cancel_url: `${FRONTEND_API}/cancel`,
+      success_url: `${process.env.FRONTEND_API}/success`,
+      cancel_url: `${process.env.FRONTEND_API}/cancel`,
 
       payment_intent_data: {
         metadata: {
