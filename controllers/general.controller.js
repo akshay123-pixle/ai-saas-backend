@@ -1,10 +1,11 @@
+import mongoose from "mongoose";
 import { Generate } from "../models/aiGenerate.model.js";
 import { User } from "../models/user.model.js";
 
 export const getAllContent = async (req, res) => {
   try {
-    const userId = req.user?.userId;
-    console.log("userId",userId);
+    const {userId} = req.body
+    // console.log("userId",userId);
     
     
     if (!userId) {

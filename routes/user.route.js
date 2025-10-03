@@ -9,7 +9,7 @@ import { protect } from "../middleware/authentication.middleware.js";
 
 
 const router = express.Router();
-router.get("/getAllData", protect, getAllContent);
+router.post("/getAllData", getAllContent);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);

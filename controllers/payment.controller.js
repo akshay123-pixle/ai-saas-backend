@@ -9,6 +9,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const vCreate = async (req, res) => {
   console.log("Inside vCreate, req.body:", req.body);
   const { unit_amount, serviceType = "Premium", userId } = req.body;
+  const user = await User.find({ userId });
+  // if (user.serviceType["Premium"]) {
+  //   return res
+  //     .status(400)
+  //     .json({
+  //       success: false,
+  //       message: `$${user.name} has already paid so no need further`,
+  //     });
+  // }
 
   if (!unit_amount) {
     return res
@@ -32,8 +41,8 @@ export const vCreate = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: "https://example.com/success",
-      cancel_url: "https://example.com/cancel",
+      success_url: `${FRONTEND_API}/success`,
+      cancel_url: `${FRONTEND_API}/cancel`,
 
       payment_intent_data: {
         metadata: {

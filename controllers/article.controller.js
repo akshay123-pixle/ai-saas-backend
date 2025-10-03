@@ -5,9 +5,9 @@ import { blogtitleAI } from "../ai/blogTitleAI.js";
 
 export const writeArticle = async (req, res) => {
   try {
-    const userId = req.user?.userId;
+    // const userId = req.user?.userId;
 
-    const { text } = req.body;
+    const { text,userId } = req.body;
 
     // Validate input
     if (!text) {
@@ -52,8 +52,8 @@ export const writeArticle = async (req, res) => {
 
 export const blogTitle = async (req, res) => {
   try {
-    const userId = req.user?.userId;
-    const { text } = req.body; // 🔍 CHANGE THIS LINE if you expect "prompt"
+    // const userId = req.user?.userId;
+    const { text,userId } = req.body; // 🔍 CHANGE THIS LINE if you expect "prompt"
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized", success: false });

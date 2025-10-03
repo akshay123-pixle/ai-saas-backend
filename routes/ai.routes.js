@@ -10,9 +10,9 @@ import { blogtitleAI } from "../ai/blogTitleAI.js";
 
 const router = express.Router();
 
-router.post("/write-article", protect, writeArticle);
+router.post("/write-article", writeArticle);
 // blog
 
-router.post("/blog-title", protect, blogTitle);
+router.post("/blog-title", blogTitle);
 
 export default router
