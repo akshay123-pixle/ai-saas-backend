@@ -54,7 +54,7 @@ export const registerUser = async (req, res) => {
 
         res.status(201).json({
             message: "User registered & logged in",
-            user: { id: newUser._id, name: newUser.name, email: newUser.email }
+            user: { id: newUser._id, name: newUser.name, email: newUser.email, plan:newUser.serviceType }
         });
 
     } catch (error) {

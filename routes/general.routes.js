@@ -1,7 +1,7 @@
 // import express from "express";
-// import { getAllContent } from "../controllers/general.controller";
+// import { getAllContent, singleContent } from "../controllers/general.controller";
 // const router = express.Router();
 
-// router.get("/getAllData", protect, getAllContent);
+// router.get("/getSingle", singleContent);
 
 // export default router
