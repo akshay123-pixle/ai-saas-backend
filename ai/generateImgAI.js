@@ -1,57 +1,78 @@
 import fetch from "node-fetch";
-import fs from "fs";
+import FormData from "form-data";
 import dotenv from "dotenv";
+import cloudinary from "../utils/cloudinary.js";
+import { Generate } from "../models/aiGenerate.model.js";
+
 dotenv.config();
 
-const API_KEY = process.env.DYNAPICTURES_API_KEY;
-const DESIGN_UID = process.env.DYNAPICTURES_DESIGN_UID;
+const CLIPDROP_API_KEY = process.env.CLIPDROP_API_KEY;
 
-const payload = {
-  params: [
-    {
-      name: "text1",
-      text: "cat is having meal",
-      color: "#333",
-      backgroundColor: "#f9f9f9",
-      borderColor: "#ddd",
-      borderWidth: "1px",
-      borderRadius: "5px",
-      opacity: 1,
-      width: "100px",
-      height: "100px"
-    },
-  ],
-};
+export async function generateImage(req, res) {
+  const { prompt, userId } = req.body;
 
-async function generateImage() {
-  const url = `https://api.dynapictures.com/workspaces}`;
+  if (!prompt || !userId) {
+    return res.status(400).json({ error: "Prompt and userId are required" });
+  }
 
   try {
-    const res = await fetch(url, {
+    // Step 1: Prepare form data for ClipDrop
+    const form = new FormData();
+    form.append("prompt", prompt);
+
+    // Step 2: Call ClipDrop API
+    const response = await fetch("https://clipdrop-api.co/text-to-image/v1", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
+        "x-api-key": CLIPDROP_API_KEY,
       },
-      body: JSON.stringify(payload),
+      body: form,
     });
 
-    const data = await res.json();
-    console.log("✅ API Response:", data);
-
-    if (!res.ok) {
-      console.error("❌ API Error:", data);
-      return;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`ClipDrop API error: ${response.status} ${errorText}`);
     }
 
-    const imageUrl = data.imageUrl; // ✅ Corrected
-    const imageRes = await fetch(imageUrl);
-    const buffer = await imageRes.buffer();
-    fs.writeFileSync("dynapictures-image.jpeg", buffer); // Changed extension to match response
-    console.log("✅ Image saved as dynapictures-image.jpeg");
-  } catch (err) {
-    console.error("❌ Error:", err.message);
+    // Step 3: Read image data as buffer
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Optional: Save image locally (for debugging)
+    // await fs.writeFile("cat.png", buffer);
+
+    // Step 4: Upload to Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { resource_type: "image" },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        }
+      );
+      stream.end(buffer);
+    });
+
+    // Step 5: Save to MongoDB
+    const savedImage = await Generate.create({
+      userId,
+      type: "remove-bg",
+      input: prompt,
+      output: uploadResult.secure_url,
+    });
+
+    // Step 6: Return success response
+    return res.status(200).json({
+      success: true,
+      message: "background removed successfully, uploaded, and saved",
+      imageUrl: savedImage.output,
+    });
+  } catch (error) {
+    console.error("Generate image error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to generate image",
+      error: error.message,
+    });
   }
 }
-
-await generateImage();
